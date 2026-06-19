@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introdução ao Backend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f7f7f5;
+      --bg3: #efefec;
+      --text: #1a1a1a;
+      --text2: #555550;
+      --text3: #999990;
+      --border: rgba(0, 0, 0, 0.1);
+      --border2: rgba(0, 0, 0, 0.18);
+      --purple: #7F77DD;
+      --purple-light: #EEEDFE;
+      --purple-dark: #3C3489;
+      --teal: #1D9E75;
+      --teal-light: #E1F5EE;
+      --teal-dark: #085041;
+      --amber: #BA7517;
+      --amber-light: #FAEEDA;
+      --amber-dark: #633806;
+      --blue: #185FA5;
+      --blue-light: #E6F1FB;
+      --blue-dark: #0C447C;
+      --red: #A32D2D;
+      --red-light: #FCEBEB;
+      --red-dark: #791F1F;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --font: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --slide-w: 900px;
+      --slide-h: 540px;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: var(--text);
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: var(--slide-w);
+    }
+
+    .slide-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border2);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .slide {
+      display: none;
+      position: absolute;
+      inset: 0;
+      padding: clamp(1.5rem, 4%, 2.5rem) clamp(1.5rem, 5%, 3rem);
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .slide-num {
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+      font-weight: 500;
+    }
+
+    .slide-title {
+      font-size: clamp(18px, 2.8vw, 26px);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
+    }
+
+    .slide-sub {
+      font-size: clamp(12px, 1.6vw, 15px);
+      color: var(--text2);
+      line-height: 1.65;
+      margin-bottom: 1.2rem;
+      max-width: 600px;
+    }
+
+    /* NAV */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-family: var(--font);
+      padding: 7px 16px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg2);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+      background: var(--bg);
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border2);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .dot.active {
+      background: var(--purple);
+      transform: scale(1.3);
+    }
+
+    /* SLIDE 1 — RESTAURANTE */
+    .restaurant {
+      display: flex;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .rest-col {
+      flex: 1;
+      padding: clamp(0.8rem, 2vw, 1.25rem) 0.75rem;
+      text-align: center;
+      border-right: 0.5px solid var(--border);
+      background: var(--bg);
+    }
+
+    .rest-col:last-child {
+      border-right: none;
+    }
+
+    .rest-emoji {
+      font-size: clamp(28px, 4vw, 40px);
+      margin-bottom: 0.4rem;
+    }
+
+    .rest-name {
+      font-size: clamp(11px, 1.5vw, 14px);
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .rest-desc {
+      font-size: clamp(10px, 1.2vw, 12px);
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: clamp(9px, 1.1vw, 11px);
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .b-blue {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+    }
+
+    .b-amber {
+      background: var(--amber-light);
+      color: var(--amber-dark);
+    }
+
+    .b-teal {
+      background: var(--teal-light);
+      color: var(--teal-dark);
+    }
+
+    .b-purple {
+      background: var(--purple-light);
+      color: var(--purple-dark);
+    }
+
+    .b-red {
+      background: var(--red-light);
+      color: var(--red-dark);
+    }
+
+    .quote-bar {
+      padding: 0.75rem 1rem;
+      background: var(--purple-light);
+      border-left: 3px solid var(--purple);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: clamp(11px, 1.4vw, 14px);
+      color: var(--purple-dark);
+      line-height: 1.5;
+    }
+
+    /* SLIDE 2 — DEMO */
+    .demo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .demo-box {
+      flex: 1;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: clamp(0.75rem, 2vw, 1.25rem);
+      background: var(--bg2);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .demo-box-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+    }
+
+    .form-field {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: var(--font);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    .form-field:focus {
+      border-color: var(--purple);
+    }
+
+    .send-btn {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      font-family: var(--font);
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--purple);
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-top: auto;
+    }
+
+    .send-btn:hover {
+      opacity: 0.88;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .arrow-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 56px;
+      flex-shrink: 0;
+    }
+
+    .arrow-label {
+      font-size: 9px;
+      color: var(--text3);
+      letter-spacing: 0.04em;
+    }
+
+    .arrow-track {
+      width: 44px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .arrow-ball {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--purple);
+      position: absolute;
+      top: -4px;
+      left: 0;
+      opacity: 0;
+    }
+
+    .arrow-ball.go {
+      animation: rollRight 0.7s ease-in-out forwards;
+    }
+
+    .arrow-ball.back {
+      animation: rollLeft 0.7s ease-in-out forwards;
+    }
+
+    @keyframes rollRight {
+      0% {
+        left: 0;
+        opacity: 1
+      }
+
+      100% {
+        left: 34px;
+        opacity: 1
+      }
+    }
+
+    @keyframes rollLeft {
+      0% {
+        left: 34px;
+        opacity: 1
+      }
+
+      100% {
+        left: 0;
+        opacity: 1
+      }
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(10px, 1.3vw, 12px);
+      padding: 6px 8px;
+      border-radius: var(--radius);
+      opacity: 0.3;
+      transition: opacity 0.3s, background 0.3s;
+      color: var(--text2);
+    }
+
+    .step.active {
+      opacity: 1;
+      background: var(--bg);
+    }
+
+    .step.done {
+      opacity: 1;
+      color: var(--teal-dark);
+    }
+
+    .step-ic {
+      font-size: 14px;
+    }
+
+    /* SLIDE 3 — API */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .flow-pill {
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-size: clamp(10px, 1.4vw, 13px);
+      font-weight: 500;
+    }
+
+    .flow-arrow {
+      color: var(--text3);
+      font-size: 14px;
+    }
+
+    .json-block {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.1rem;
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.4vw, 13px);
+      line-height: 1.9;
+      color: var(--text);
+    }
+
+    .jk {
+      color: var(--blue);
+    }
+
+    .jv {
+      color: var(--teal);
+    }
+
+    .jp {
+      color: var(--text3);
+    }
+
+    /* SLIDE 4 — GATOS */
+    .cats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      flex: 1;
+    }
+
+    .cat-card {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cat-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      background: var(--bg2);
+    }
+
+    .cat-info {
+      padding: 0.6rem 0.65rem;
+    }
+
+    .cat-code {
+      font-size: clamp(15px, 2vw, 20px);
+      font-weight: 600;
+    }
+
+    .cat-name {
+      font-size: clamp(9px, 1.1vw, 11px);
+      color: var(--text2);
+      margin: 2px 0 5px;
+    }
+
+    .cat-rest {
+      font-size: clamp(8px, 1vw, 10px);
+      color: var(--text3);
+      line-height: 1.4;
+      margin-bottom: 5px;
+    }
+
+    /* SLIDE 5 — TECH */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      flex: 1;
+    }
+
+    .tech-card {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: clamp(0.75rem, 2vw, 1.1rem);
+      background: var(--bg2);
+    }
+
+    .tech-head {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+
+    .tech-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.55rem;
+    }
+
+    .tech-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .tech-n {
+      font-size: clamp(11px, 1.4vw, 13px);
+      font-weight: 500;
+    }
+
+    .tech-d {
+      font-size: clamp(9px, 1.1vw, 11px);
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    /* SLIDE 6 — GANCHO */
+    .gancho {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .big-emoji {
+      font-size: clamp(36px, 6vw, 56px);
+    }
+
+    .gancho-text {
+      font-size: clamp(13px, 1.7vw, 16px);
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 500px;
+    }
+
+    .prompt-card {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.85rem 1.25rem;
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.3vw, 12px);
+      color: var(--text2);
+      line-height: 1.75;
+      text-align: left;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .ph {
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .pl {
+      font-size: 10px;
+      color: var(--text3);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <div class="slide-container">
+
+      <!-- SLIDE 1 -->
+      <div class="slide active" id="s1">
+        <div class="slide-num">01 / 06</div>
+        <div class="slide-title">Como funciona o Backend?</div>
+        <div class="slide-sub">Pensa num restaurante. O frontend é o salão — o que o cliente vê. O backend é a cozinha —
+          onde a comida é preparada, os pedidos são processados e os ingredientes ficam guardados.</div>
+
+        <div class="restaurant">
+          <div class="rest-col">
+            <div class="rest-emoji">🧑‍💼</div>
+            <div class="rest-name">Cliente</div>
+            <div class="rest-desc">Faz o pedido</div>
+            <span class="badge b-blue">Frontend</span>
+          </div>
+          <div class="rest-col">
+            <div class="rest-emoji">🤵</div>
+            <div class="rest-name">Garçom</div>
+            <div class="rest-desc">Leva e traz</div>
+            <span class="badge b-amber">API</span>
+          </div>
+          <div class="rest-col">
+            <div class="rest-emoji">👨‍🍳</div>
+            <div class="rest-name">Cozinha</div>
+            <div class="rest-desc">Processa tudo</div>
+            <span class="badge b-teal">Backend</span>
+          </div>
+        </div>
+
+        <div class="quote-bar">
+          No mundo da computação, a gente chama isso de <strong>Cliente</strong> e <strong>Servidor</strong>.
+        </div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide" id="s2">
+        <div class="slide-num">02 / 06</div>
+        <div class="slide-title">Vendo o backend em ação</div>
+        <div class="slide-sub">O cliente faz um pedido, o garçom leva até a cozinha, a cozinha processa e devolve a
+          resposta.</div>
+
+        <div class="demo-area">
+          <div class="demo-box">
+            <div class="demo-box-title">🧑‍💼 Cliente (Frontend)</div>
+            <input class="form-field" type="text" placeholder="Nome do paciente" id="f-nome" />
+            <input class="form-field" type="text" placeholder="CRM do médico" id="f-crm" />
+            <button class="send-btn" id="demo-btn" onclick="runDemo()">Enviar pedido →</button>
+          </div>
+
+          <div class="arrow-col">
+            <div class="arrow-label">request</div>
+            <div class="arrow-track">
+              <div class="arrow-ball" id="ball-req"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="arrow-track" style="transform:scaleX(-1)">
+              <div class="arrow-ball" id="ball-res"></div>
+            </div>
+            <div class="arrow-label">response</div>
+          </div>
+
+          <div class="demo-box">
+            <div class="demo-box-title">⚙️ Backend</div>
+            <div class="step" id="st1"><span class="step-ic">📥</span> Recebendo pedido...</div>
+            <div class="step" id="st2"><span class="step-ic">🛡️</span> Validando dados...</div>
+            <div class="step" id="st3"><span class="step-ic">🗄️</span> Buscando no banco...</div>
+            <div class="step" id="st4"><span class="step-ic">✅</span> Resposta pronta!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide" id="s3">
+        <div class="slide-num">03 / 06</div>
+        <div class="slide-title">O que é uma API?</div>
+        <div class="slide-sub">Lembra do garçom? Ele segue um formato — o pedido tem um nome e a resposta tem uma
+          estrutura. Isso é a API: a linguagem que o cliente e o servidor usam pra se falar.</div>
+
+        <div class="flow-row">
+          <div class="flow-pill b-blue">🧑‍💼 Frontend</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-pill b-amber">GET /pacientes</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-pill b-teal">Backend</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-pill b-teal">Banco de dados</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-pill b-purple">JSON</div>
+        </div>
+
+        <div class="json-block">
+          <span class="jp">{</span><br>
+          &nbsp;&nbsp;<span class="jk">"id"</span><span class="jp">:</span> <span class="jv">1</span><span
+            class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"nome"</span><span class="jp">:</span> <span class="jv">"Ana Silva"</span><span
+            class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"cargo"</span><span class="jp">:</span> <span class="jv">"Enfermeira"</span><br>
+          <span class="jp">}</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide" id="s4">
+        <div class="slide-num">04 / 06</div>
+        <div class="slide-title">Códigos de resposta</div>
+        <div class="slide-sub">O garçom sempre volta com uma resposta. Essa resposta tem um código — e os gatinhos da
+          internet ajudam a lembrar cada um. 🐱</div>
+
+        <div class="cats">
+          <div class="cat-card">
+            <img class="cat-img" src="https://http.cat/200" alt="Gato status 200" loading="lazy" />
+            <div class="cat-info">
+              <div class="cat-code">200</div>
+              <div class="cat-name">OK</div>
+              <div class="cat-rest">Pedido entregue com sucesso</div>
+              <span class="badge b-teal" style="font-size:9px">✓ sucesso</span>
+            </div>
+          </div>
+          <div class="cat-card">
+            <img class="cat-img" src="https://http.cat/401" alt="Gato status 401" loading="lazy" />
+            <div class="cat-info">
+              <div class="cat-code">401</div>
+              <div class="cat-name">Não autorizado</div>
+              <div class="cat-rest">Cliente sem reserva</div>
+              <span class="badge b-amber" style="font-size:9px">⚠ acesso</span>
+            </div>
+          </div>
+          <div class="cat-card">
+            <img class="cat-img" src="https://http.cat/404" alt="Gato status 404" loading="lazy" />
+            <div class="cat-info">
+              <div class="cat-code">404</div>
+              <div class="cat-name">Não encontrado</div>
+              <div class="cat-rest">Item que não tem no cardápio</div>
+              <span class="badge b-amber" style="font-size:9px">⚠ busca</span>
+            </div>
+          </div>
+          <div class="cat-card">
+            <img class="cat-img" src="https://http.cat/500" alt="Gato status 500" loading="lazy" />
+            <div class="cat-info">
+              <div class="cat-code">500</div>
+              <div class="cat-name">Erro no servidor</div>
+              <div class="cat-rest">Cozinha pegou fogo</div>
+              <span class="badge b-red" style="font-size:9px">✕ erro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide" id="s5">
+        <div class="slide-num">05 / 06</div>
+        <div class="slide-title">As ferramentas do backend</div>
+        <div class="slide-sub">Assim como uma cozinha tem fogão, faca e panela — o backend tem linguagens, bancos de
+          dados e frameworks.</div>
+
+        <div class="tech-grid">
+          <div class="tech-card">
+            <div class="tech-head">💻 Linguagens</div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#7F77DD"></div>
+              <div>
+                <div class="tech-n">JavaScript (Node.js)</div>
+                <div class="tech-d">O mesmo do frontend, roda no servidor também</div>
+              </div>
+            </div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#1D9E75"></div>
+              <div>
+                <div class="tech-n">Python</div>
+                <div class="tech-d">Simples, muito usado em saúde e IA</div>
+              </div>
+            </div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#378ADD"></div>
+              <div>
+                <div class="tech-n">Java / Go</div>
+                <div class="tech-d">Robustos, grandes empresas</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-card">
+            <div class="tech-head">🗄️ Bancos de dados</div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#BA7517"></div>
+              <div>
+                <div class="tech-n">PostgreSQL / MySQL</div>
+                <div class="tech-d">Dados em tabelas, como uma planilha organizada</div>
+              </div>
+            </div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#D85A30"></div>
+              <div>
+                <div class="tech-n">MongoDB</div>
+                <div class="tech-d">Dados livres, sem estrutura rígida</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-card">
+            <div class="tech-head">🔧 Frameworks</div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#7F77DD"></div>
+              <div>
+                <div class="tech-n">Express</div>
+                <div class="tech-d">Node.js — minimalista e direto</div>
+              </div>
+            </div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#1D9E75"></div>
+              <div>
+                <div class="tech-n">FastAPI</div>
+                <div class="tech-d">Python — moderno e rápido</div>
+              </div>
+            </div>
+            <div class="tech-item">
+              <div class="tech-dot" style="background:#378ADD"></div>
+              <div>
+                <div class="tech-n">Spring</div>
+                <div class="tech-d">Java — empresarial e robusto</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6 -->
+      <div class="slide" id="s6">
+        <div class="slide-num">06 / 06</div>
+        <div class="gancho">
+          <div class="big-emoji">🤖</div>
+          <div class="slide-title" style="text-align:center">Agora é a nossa vez</div>
+          <div class="gancho-text">Antigamente, criar um backend do zero levava dias. Hoje, com IA, dá pra montar uma
+            API funcional em minutos — e é exatamente isso que a gente vai fazer agora.</div>
+          <div class="prompt-card">
+            <span class="pl">prompt que vamos usar →</span>
+
+
+            Crie uma API REST simples utilizando apenas <span class="ph">Node.js puro</span> (módulo HTTP nativo), sem
+            frameworks como <span class="ph">Express</span> e sem banco de dados.<br><br>
+
+            <strong>Requisitos:</strong><br>
+            • Dados dos <span class="ph">pacientes</span> armazenados em um array em memória<br>
+            • Cada paciente deve possuir: id, nome, idade e convênio<br><br>
+
+            <strong>Rotas:</strong><br>
+            • <span class="ph">GET /pacientes</span> → retorna todos os pacientes<br>
+            • <span class="ph">GET /pacientes/:id</span> → retorna um paciente pelo ID<br><br>
+
+            <strong>Tratamento de erros:</strong><br>
+            • Paciente não encontrado → <span class="ph">HTTP 404</span><br>
+            • Rota inexistente → <span class="ph">HTTP 404</span><br>
+            • Respostas de erro em formato JSON<br><br>
+
+            <strong>Requisitos técnicos:</strong><br>
+            • Utilizar códigos HTTP adequados<br>
+            • Configurar <span class="ph">Content-Type: application/json</span><br>
+            • Executar na porta <span class="ph">3000</span><br>
+            • Não utilizar bibliotecas externas<br>
+            • Comentar as principais partes do código<br><br>
+
+            <strong>Entrega:</strong><br>
+            • Explicar como executar o projeto<br>
+            • Demonstrar como testar as rotas pelo navegador
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /slide-container -->
+
+    <div class="nav" style="margin-top:0.75rem">
+      <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled>← Anterior</button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn" id="btn-next" onclick="go(1)">Próximo →</button>
+    </div>
+  </div>
+
+  <script>
+    let cur = 1;
+    const total = 6;
+    const dotsEl = document.getElementById('dots');
+
+    for (let i = 1; i <= total; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 1 ? ' active' : '');
+      d.onclick = () => goTo(i);
+      dotsEl.appendChild(d);
+    }
+
+    function goTo(n) {
+      document.getElementById('s' + cur).classList.remove('active');
+      dotsEl.children[cur - 1].classList.remove('active');
+      cur = n;
+      document.getElementById('s' + cur).classList.add('active');
+      dotsEl.children[cur - 1].classList.add('active');
+      document.getElementById('btn-prev').disabled = cur === 1;
+      document.getElementById('btn-next').disabled = cur === total;
+      resetDemo();
+    }
+
+    function go(dir) {
+      const next = cur + dir;
+      if (next >= 1 && next <= total) goTo(next);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(-1);
+    });
+
+    function resetDemo() {
+      ['st1', 'st2', 'st3', 'st4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'step';
+      });
+      ['ball-req', 'ball-res'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.className = 'arrow-ball'; el.style.opacity = '0'; }
+      });
+      const btn = document.getElementById('demo-btn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Enviar pedido →';
+        btn.onclick = runDemo;
+      }
+    }
+
+    function activateStep(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function runDemo() {
+      const btn = document.getElementById('demo-btn');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      const req = document.getElementById('ball-req');
+      req.className = 'arrow-ball go';
+
+      setTimeout(() => activateStep('st1'), 800);
+      setTimeout(() => activateStep('st2'), 1500);
+      setTimeout(() => activateStep('st3'), 2200);
+      setTimeout(() => {
+        activateStep('st4');
+        document.getElementById('st4').classList.add('done');
+        const res = document.getElementById('ball-res');
+        res.className = 'arrow-ball back';
+        btn.textContent = 'Rodar de novo';
+        btn.disabled = false;
+        btn.onclick = () => { resetDemo(); setTimeout(runDemo, 80); };
+      }, 3000);
+    }
+  </script>
+</body>
+
+</html>
